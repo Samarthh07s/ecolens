@@ -104,6 +104,26 @@ Python 3.15 or newer may not work with the pinned NumPy and Pandas versions.
 
 The launcher creates a local `venv` folder and installs the dependencies automatically on first run.
 
+## 6A. Build and run a Windows EXE
+
+EcoLens can also be packaged as a portable Windows application using PyInstaller. The user does not need to install Python to run the generated executable.
+
+1. Open the project folder.
+2. Double-click **`build_exe.bat`**.
+3. Wait for the builder to finish.
+4. Open the generated folder:
+
+   ```text
+   EcoLens-Desktop\EcoLens.exe
+   ```
+
+5. Double-click `EcoLens.exe`.
+6. The local dashboard opens automatically at `http://127.0.0.1:5000`.
+
+The executable keeps the SQLite database beside itself in the `EcoLens-Desktop` folder. Internet access is still required for fresh Open-Meteo data; cached data works for previously loaded locations.
+
+For distribution, compress the complete `EcoLens-Desktop` folder as a ZIP. Windows SmartScreen may show a warning because the executable is not digitally signed. This is normal for locally built student projects; users can choose **More info → Run anyway** after confirming the file came from the project source.
+
 ## 7. Manual run commands
 
 Open Command Prompt or PowerShell in the project folder:
@@ -286,4 +306,3 @@ Then restart the application.
 - Background alerts for saved locations
 - User authentication and cloud synchronization
 - Community environmental reports
-

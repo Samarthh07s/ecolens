@@ -5,8 +5,12 @@ Everything you might want to tweak lives here: API endpoints, timeouts,
 default city, score weights, thresholds and the About-page details.
 """
 import os
+import sys
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# In a PyInstaller build, resources are unpacked under a temporary directory,
+# while the executable directory is the user-visible place for persistent data.
+RUNTIME_DIR = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else BASE_DIR
 
 # ---------------------------------------------------------------------------
 # App / server
@@ -18,7 +22,7 @@ PORT = 5000
 
 # SQLite file. Created automatically on first run. Tests override this
 # with the ECOLENS_DB environment variable so they never touch real data.
-DB_PATH = os.environ.get("ECOLENS_DB", os.path.join(BASE_DIR, "ecolens.db"))
+DB_PATH = os.environ.get("ECOLENS_DB", os.path.join(RUNTIME_DIR, "ecolens.db"))
 
 # ---------------------------------------------------------------------------
 # Data sources (Open-Meteo: free, no API key needed)

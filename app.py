@@ -7,6 +7,8 @@ Run:  python app.py    then open http://127.0.0.1:5000
 import io
 import math
 import re
+import threading
+import webbrowser
 
 from flask import Flask, Response, jsonify, render_template, request
 
@@ -370,4 +372,9 @@ if __name__ == "__main__":
     print(f"  Open     : http://{config.HOST}:{config.PORT}")
     print("  Stop     : press CTRL+C in this window")
     print("=" * 60)
+    if getattr(config, "RUNTIME_DIR", config.BASE_DIR) != config.BASE_DIR:
+        threading.Timer(
+            1.2,
+            lambda: webbrowser.open(f"http://{config.HOST}:{config.PORT}"),
+        ).start()
     app.run(host=config.HOST, port=config.PORT, debug=False)
