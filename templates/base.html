@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ APP_NAME }}{% endblock %} · {{ APP_NAME }}</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {# theme.js runs before the page paints so there is no light/dark flash #}
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</head>
+<body data-page="{{ active }}">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="{{ url_for('dashboard') }}" aria-label="{{ APP_NAME }} home">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M9 19c4-9 10-10 15-10-1 6-4 12-12 13" fill="currentColor" opacity=".9"/>
+        </svg>
+        <span class="brand-name">{{ APP_NAME }}</span>
+        <span class="brand-tag">{{ APP_TAGLINE }}</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mainNav">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav" id="mainNav">
+        <a href="{{ url_for('dashboard') }}" class="{{ 'active' if active == 'dashboard' }}">Dashboard</a>
+        <a href="{{ url_for('trends_page') }}" class="{{ 'active' if active == 'trends' }}">Trends</a>
+        <a href="{{ url_for('compare_page') }}" class="{{ 'active' if active == 'compare' }}">Compare</a>
+        <a href="{{ url_for('alerts_page') }}" class="{{ 'active' if active == 'alerts' }}">Alerts <span class="nav-count" id="navAlertCount" hidden></span></a>
+        <a href="{{ url_for('settings_page') }}" class="{{ 'active' if active == 'settings' }}">Settings</a>
+        <a href="{{ url_for('about_page') }}" class="{{ 'active' if active == 'about' }}">About</a>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light/dark theme" title="Toggle light/dark theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span>{{ APP_NAME }} · Data: Open-Meteo (weather &amp; CAMS air-quality model)</span>
+      <span class="muted">Noise readings are approximate and uncalibrated.</span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

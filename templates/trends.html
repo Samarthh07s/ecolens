@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Trends{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1>History &amp; Trends</h1>
+    <p class="muted">Hourly averages of saved readings, analysed with Pandas and NumPy.</p>
+  </div>
+  <a class="btn" id="btnCsv" href="/api/export.csv" download>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>
+    Download CSV
+  </a>
+</section>
+
+<section class="filters card">
+  <label class="select-wrap">
+    <span class="select-label">Location</span>
+    <select id="locSelect" aria-label="Location filter"><option value="">All locations</option></select>
+  </label>
+  <div class="segmented" role="group" aria-label="Time range">
+    <button type="button" data-range="24h" class="active">24 h</button>
+    <button type="button" data-range="7d">7 days</button>
+    <button type="button" data-range="30d">30 days</button>
+  </div>
+  <span class="muted small" id="pointsInfo"></span>
+</section>
+
+<div class="error-box" id="errorBox" role="alert" hidden></div>
+
+<section class="empty card" id="emptyState" hidden>
+  <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 52h48M14 44l10-12 9 7 15-19" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <h2>No history yet</h2>
+  <p>Refresh the dashboard a few times to build history. Each refresh also stores the last 2 days of real hourly data from the API, so charts appear after your first visit.</p>
+  <a class="btn btn-primary" href="/">Go to Dashboard</a>
+</section>
+
+<div id="trendContent">
+  <section class="grid stats" id="statCards"></section>
+
+  <section class="card chart-card">
+    <div class="card-head"><h2>Air Quality (US AQI)</h2><span class="trend-pill" id="trend-aqi"></span></div>
+    <div class="chart-box"><canvas id="chartAqi" aria-label="AQI chart" role="img"></canvas></div>
+  </section>
+  <section class="card chart-card">
+    <div class="card-head"><h2>Temperature (°C)</h2><span class="trend-pill" id="trend-temperature"></span></div>
+    <div class="chart-box"><canvas id="chartTemp" aria-label="Temperature chart" role="img"></canvas></div>
+  </section>
+  <section class="card chart-card">
+    <div class="card-head"><h2>Health Score</h2><span class="trend-pill" id="trend-score"></span></div>
+    <div class="chart-box"><canvas id="chartScore" aria-label="Score chart" role="img"></canvas></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Next 6 hours <span class="tag">estimate</span></h2></div>
+    <p class="muted small">Simple linear regression (NumPy <code>polyfit</code>) on the last 12 hourly points. It extends the recent trend in a straight line; it is <strong>not</strong> a weather forecast and ignores daily cycles.</p>
+    <div class="table-scroll">
+      <table class="tbl" id="forecastTable">
+        <thead><tr><th>Time</th><th>AQI (est.)</th><th>Temperature (est.)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chart.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/trends.js') }}"></script>
+{% endblock %}

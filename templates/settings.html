@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<section class="page-head page-head-accent">
+  <div>
+    <span class="eyebrow">Your EcoLens</span>
+    <h1>Personalise your experience</h1>
+    <p class="muted">These settings are local to this demo installation. No account or cloud profile is required.</p>
+  </div>
+</section>
+
+<div class="settings-layout">
+  <form class="card settings-card" id="settingsForm">
+    <div class="card-head"><h2>Health profile</h2><span class="badge" data-level="info">Saved locally</span></div>
+    <label class="field-label" for="displayName">Display name</label>
+    <input id="displayName" maxlength="60" placeholder="Eco explorer">
+    <label class="field-label" for="healthProfile">Advice profile</label>
+    <select id="healthProfile">
+      {% for key, p in profiles.items() %}
+      <option value="{{ key }}">{{ p.label }} — {{ p.note }}</option>
+      {% endfor %}
+    </select>
+    <label class="field-label" for="units">Units</label>
+    <select id="units">
+      <option value="metric">Metric (°C, km/h)</option>
+      <option value="imperial">Imperial (°F, mph)</option>
+    </select>
+    <button class="btn btn-primary" type="submit">Save preferences</button>
+    <p class="muted small" id="settingsStatus" role="status"></p>
+  </form>
+
+  <aside class="card settings-card settings-tip">
+    <span class="feature-icon">✦</span>
+    <h2>Make the demo yours</h2>
+    <p>Set a health profile before your presentation to show how the same AQI can produce different, explainable recommendations for an athlete, child, or respiratory-sensitive user.</p>
+    <a class="btn" href="{{ url_for('compare_page') }}">Compare two locations</a>
+  </aside>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %}

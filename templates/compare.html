@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Compare locations{% endblock %}
+{% block content %}
+<section class="page-head page-head-accent">
+  <div>
+    <span class="eyebrow">Decision support</span>
+    <h1>Compare locations</h1>
+    <p class="muted">Put two places side by side and choose the healthier option for your profile.</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('dashboard') }}">Back to dashboard</a>
+</section>
+
+<section class="compare-form card">
+  <div class="compare-input">
+    <label for="compareA">First location</label>
+    <input id="compareA" type="text" placeholder="Pune, Mumbai, Delhi…" autocomplete="off">
+    <div class="compare-suggestions" id="suggestionsA" hidden></div>
+  </div>
+  <div class="compare-vs" aria-hidden="true">VS</div>
+  <div class="compare-input">
+    <label for="compareB">Second location</label>
+    <input id="compareB" type="text" placeholder="Search another place" autocomplete="off">
+    <div class="compare-suggestions" id="suggestionsB" hidden></div>
+  </div>
+  <button class="btn btn-primary" id="compareRun" type="button">Compare now</button>
+</section>
+
+<div class="error-box" id="errorBox" role="alert" hidden></div>
+<section id="compareResult" hidden></section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/compare.js') }}"></script>
+{% endblock %}

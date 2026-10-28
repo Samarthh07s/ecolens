@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Environmental report{% endblock %}
+{% block content %}
+{% if error %}
+<section class="empty card">
+  <h1>Report unavailable</h1>
+  <p>{{ error }}</p>
+  <a class="btn btn-primary" href="{{ url_for('dashboard') }}">Return to dashboard</a>
+</section>
+{% else %}
+<section class="report-toolbar no-print">
+  <a class="btn" href="{{ url_for('dashboard') }}">← Dashboard</a>
+  <button class="btn btn-primary" type="button" onclick="window.print()">Print / save PDF</button>
+</section>
+<article class="report-sheet">
+  <header class="report-header">
+    <div>
+      <span class="eyebrow">EcoLens environmental brief</span>
+      <h1>{{ location.name }}</h1>
+      <p class="muted">Generated {{ payload.updated_at }} · Profile: {{ payload.recommendations.profile_label }}</p>
+    </div>
+    <div class="report-score" data-level="{{ payload.analysis.score.level }}">
+      <strong>{{ payload.analysis.score.score }}</strong><span>/100</span>
+      <small>{{ payload.analysis.score.label }}</small>
+    </div>
+  </header>
+  <section class="report-grid">
+    {% for key, label in [('aqi', 'Air quality'), ('temperature', 'Temperature'), ('humidity', 'Humidity'), ('uv', 'UV index'), ('noise', 'Noise')] %}
+    <div class="report-metric">
+      <span>{{ label }}</span>
+      <strong>{{ payload.current[key] if payload.current[key] is not none else 'Not measured' }}</strong>
+    </div>
+    {% endfor %}
+  </section>
+  <section class="report-callout" data-level="{{ payload.recommendations.level }}">
+    <span class="eyebrow">Recommendation</span>
+    <h2>{{ payload.recommendations.verdict }}</h2>
+    <p>{{ payload.recommendations.summary }}</p>
+    {% for reason in payload.recommendations.reasons %}<div>• {{ reason }}</div>{% endfor %}
+  </section>
+  <section class="report-columns">
+    <div><h2>Detected patterns</h2>{% if payload.analysis.patterns %}<ul>{% for p in payload.analysis.patterns %}<li><strong>{{ p.title }}:</strong> {{ p.detail }}</li>{% endfor %}</ul>{% else %}<p>No risky patterns detected.</p>{% endif %}</div>
+    <div><h2>Practical actions</h2><ul>{% for action in payload.recommendations.actions[:5] %}<li><strong>{{ action.title }}:</strong> {{ action.text }}</li>{% endfor %}</ul></div>
+  </section>
+  <footer class="report-footer">EcoLens is an educational decision-support tool. It is not medical advice. Data source: Open-Meteo.</footer>
+</article>
+{% endif %}
+{% endblock %}

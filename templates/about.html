@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1>About {{ APP_NAME }}</h1>
+    <p class="muted">{{ about.project_title }} · {{ about.department }}, {{ about.institute }} · {{ about.academic_year }}</p>
+  </div>
+</section>
+
+<section class="grid about-grid">
+  <article class="card span-2">
+    <h2>The project</h2>
+    <p>{{ APP_NAME }} turns live environmental data into one clear answer: <em>how healthy is it outside right now, and what should I do about it?</em> It combines air quality, temperature, humidity, UV and (optionally) noise into an Environmental Health Score, detects risky patterns, gives profile-specific advice (children, elderly, asthma, athletes), stores history for trend analysis and raises alerts when thresholds are crossed.</p>
+    <p>The "AI" is a transparent <strong>rule-based expert system</strong>: weighted scoring, threshold bands from US EPA and WHO, pattern rules and a small statistical model (linear regression) for short-term estimates. Every number can be traced back to a rule shown in the app.</p>
+  </article>
+
+  <article class="card">
+    <h2>Team</h2>
+    <ul class="people">
+      {% for m in about.team %}
+      <li><strong>{{ m.name }}</strong><span class="muted">{{ m.roll }} · {{ m.role }}</span></li>
+      {% endfor %}
+    </ul>
+    <dl class="kv">
+      <div><dt>Project guide</dt><dd>{{ about.guide }}</dd></div>
+      <div><dt>Head of Department</dt><dd>{{ about.hod }}</dd></div>
+    </dl>
+  </article>
+
+  <article class="card">
+    <h2>Tech stack</h2>
+    <ul class="tags">
+      <li>Python 3</li><li>Flask</li><li>SQLite</li><li>Pandas</li><li>NumPy</li><li>Requests</li>
+      <li>HTML5 / CSS3</li><li>Vanilla JavaScript</li><li>Chart.js (bundled)</li><li>Web Audio API</li>
+      <li>Geolocation API</li><li>Notifications API</li><li>pytest</li>
+    </ul>
+  </article>
+
+  <article class="card">
+    <h2>Data sources</h2>
+    <ul class="small">
+      <li><strong>Open-Meteo Forecast API</strong> – temperature, humidity, apparent temperature, UV index, wind (hourly, past 2 days + next 2 days).</li>
+      <li><strong>Open-Meteo Air Quality API</strong> – US AQI, PM2.5, PM10 from the CAMS atmospheric model.</li>
+      <li><strong>Open-Meteo Geocoding API</strong> – city search and autocomplete.</li>
+      <li><strong>Your device</strong> – GPS location (optional) and microphone for noise (optional, never recorded or uploaded; only the dB number is saved).</li>
+    </ul>
+  </article>
+
+  <article class="card">
+    <h2>Score weights</h2>
+    <table class="tbl tbl-compact">
+      <tbody>
+        <tr><td>Air quality</td><td>{{ (weights.aqi*100)|round|int }}%</td></tr>
+        <tr><td>Heat index</td><td>{{ (weights.heat_index*100)|round|int }}%</td></tr>
+        <tr><td>UV index</td><td>{{ (weights.uv*100)|round|int }}%</td></tr>
+        <tr><td>Humidity</td><td>{{ (weights.humidity*100)|round|int }}%</td></tr>
+        <tr><td>Noise</td><td>{{ (weights.noise*100)|round|int }}%</td></tr>
+      </tbody>
+    </table>
+  </article>
+
+  <article class="card">
+    <h2>Limitations</h2>
+    <ul class="small">
+      <li><strong>Noise is approximate.</strong> Browser microphones are not calibrated and apply their own processing; values can be off by 10 dB or more. Treat it as an indicator, not a measurement.</li>
+      <li><strong>AQI is model-based.</strong> It comes from the CAMS atmospheric model on a ~10–40 km grid, not a street-level sensor. Local sources (traffic, construction, burning) may make your spot worse.</li>
+      <li>The 6-hour estimate is a straight-line extrapolation and ignores daily cycles.</li>
+      <li>Health advice is general guidance, not medical advice.</li>
+    </ul>
+  </article>
+
+  <article class="card">
+    <h2>Future scope</h2>
+    <ul class="small">
+      <li><strong>IoT sensors</strong> – ESP32 with PM2.5 (PMS5003), DHT22 and a calibrated sound sensor for hyper-local readings.</li>
+      <li><strong>ML prediction</strong> – train a time-series model (e.g. gradient boosting or LSTM) on stored history for real AQI forecasts.</li>
+      <li><strong>Mobile app</strong> – a PWA or Flutter app with home-screen widgets.</li>
+      <li><strong>Location-based alerts</strong> – background push alerts for saved places (home, school, office).</li>
+    </ul>
+  </article>
+</section>
+{% endblock %}

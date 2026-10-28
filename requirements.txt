@@ -1,0 +1,6 @@
+# EcoLens - pinned dependencies (tested on Python 3.11, 3.12, 3.13 and 3.14, Windows 64-bit)
+Flask==3.1.3
+requests==2.34.2
+numpy==2.3.5
+pandas==2.3.3
+pytest==8.4.2

@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<section class="dashboard-intro">
+  <div>
+    <span class="eyebrow">Environmental intelligence</span>
+    <h1>Know before you go.</h1>
+    <p class="muted">A clear, explainable view of the air, heat, UV and noise around you.</p>
+  </div>
+  <div class="intro-actions">
+    <a class="btn" href="{{ url_for('compare_page') }}">Compare places</a>
+    <a class="btn" id="reportLink" href="{{ url_for('report_page') }}">Print report</a>
+  </div>
+</section>
+
+<section class="controls" aria-label="Location and profile">
+  <div class="search" id="searchBox">
+    <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+    <input id="cityInput" type="search" autocomplete="off" spellcheck="false" maxlength="80"
+           placeholder="Search a city (e.g. Mumbai, Delhi, London)"
+           role="combobox" aria-expanded="false" aria-controls="cityList" aria-autocomplete="list">
+    <ul class="suggestions" id="cityList" role="listbox" hidden></ul>
+  </div>
+  <button class="btn" id="btnLocate" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7.5"/></svg>
+    Use my location
+  </button>
+  <label class="select-wrap">
+    <span class="select-label">Profile</span>
+    <select id="profileSelect" aria-label="Health profile">
+      {% for key, p in profiles.items() %}
+      <option value="{{ key }}">{{ p.label }}</option>
+      {% endfor %}
+    </select>
+  </label>
+</section>
+
+<section class="locbar">
+  <div>
+    <h1 class="loc-name" id="locName">{{ default.name }}</h1>
+    <div class="loc-meta">
+      <span id="statusBadge" class="status status-live" hidden>Live</span>
+      <span>Last updated: <time id="lastUpdated">—</time></span>
+      <span class="muted" id="locCoords"></span>
+    </div>
+  </div>
+  <button class="btn btn-primary" id="btnRefresh" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>
+    Refresh
+  </button>
+</section>
+
+<div class="error-box" id="errorBox" role="alert" hidden></div>
+<div class="alert-stack" id="alertStack" aria-live="polite"></div>
+
+<section class="hero" id="hero">
+  <div class="score-panel card">
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="ring-track" cx="100" cy="100" r="84"/>
+        <circle class="ring-value" id="ringValue" cx="100" cy="100" r="84"/>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-score" id="scoreValue"><span class="skeleton sk-num"></span></div>
+        <div class="ring-sub">/ 100</div>
+      </div>
+    </div>
+    <div class="score-text">
+      <div class="eyebrow">Environmental Health Score</div>
+      <div class="score-label" id="scoreLabel"><span class="skeleton sk-line w60"></span></div>
+      <p class="muted small" id="scoreNote">Weighted from air quality, heat index, UV, humidity and noise.</p>
+      <button class="link-btn" id="btnHow" type="button">How is this calculated?</button>
+    </div>
+  </div>
+
+  <div class="patterns card">
+    <div class="card-head"><h2>What the analyzer sees</h2></div>
+    <ul class="pattern-list" id="patternList">
+      <li class="skeleton sk-block"></li>
+      <li class="skeleton sk-block"></li>
+    </ul>
+  </div>
+</section>
+
+<section class="grid cards" aria-label="Current conditions">
+  <article class="card metric" id="cardAqi">
+    <div class="card-head"><h2>Air Quality</h2><span class="badge" data-level="none">—</span></div>
+    <div class="metric-main"><span class="big" data-f="aqi"><span class="skeleton sk-num"></span></span><span class="unit">US AQI</span></div>
+    <dl class="metric-sub">
+      <div><dt>PM2.5</dt><dd><span data-f="pm25">—</span> µg/m³</dd></div>
+      <div><dt>PM10</dt><dd><span data-f="pm10">—</span> µg/m³</dd></div>
+    </dl>
+    <div class="scale scale-aqi" aria-hidden="true"><i class="scale-pin" data-pin="aqi"></i></div>
+    <p class="advice" data-advice="aqi"></p>
+  </article>
+
+  <article class="card metric" id="cardTemp">
+    <div class="card-head"><h2>Temperature</h2><span class="badge" data-level="none">—</span></div>
+    <div class="metric-main"><span class="big" data-f="temperature"><span class="skeleton sk-num"></span></span><span class="unit">°C</span></div>
+    <dl class="metric-sub">
+      <div><dt>Feels like</dt><dd><span data-f="feels_like">—</span> °C</dd></div>
+      <div><dt>Heat index</dt><dd><span data-f="heat_index">—</span> °C</dd></div>
+    </dl>
+    <p class="advice" data-advice="temperature"></p>
+  </article>
+
+  <article class="card metric" id="cardHum">
+    <div class="card-head"><h2>Humidity</h2><span class="badge" data-level="none">—</span></div>
+    <div class="metric-main"><span class="big" data-f="humidity"><span class="skeleton sk-num"></span></span><span class="unit">%</span></div>
+    <dl class="metric-sub">
+      <div><dt>Wind</dt><dd><span data-f="wind">—</span> km/h</dd></div>
+      <div><dt>Comfort</dt><dd>30 – 60 %</dd></div>
+    </dl>
+    <div class="bar" aria-hidden="true"><i data-bar="humidity"></i></div>
+    <p class="advice" data-advice="humidity"></p>
+  </article>
+
+  <article class="card metric" id="cardUv">
+    <div class="card-head"><h2>UV Index</h2><span class="badge" data-level="none">—</span></div>
+    <div class="metric-main"><span class="big" data-f="uv"><span class="skeleton sk-num"></span></span><span class="unit">WHO UVI</span></div>
+    <dl class="metric-sub">
+      <div><dt>Peak hours</dt><dd>11:00 – 15:00</dd></div>
+      <div><dt>Today's max</dt><dd><span data-f="uv_max">—</span></dd></div>
+    </dl>
+    <div class="scale scale-uv" aria-hidden="true"><i class="scale-pin" data-pin="uv"></i></div>
+    <p class="advice" data-advice="uv"></p>
+  </article>
+
+  <article class="card metric noise-card" id="cardNoise">
+    <div class="card-head"><h2>Noise</h2><span class="badge" data-level="none">Not measured yet</span></div>
+    <div class="metric-main">
+      <span class="big" id="noiseValue">—</span><span class="unit">dB (approx.)</span>
+    </div>
+    <div class="meter" aria-hidden="true"><i id="noiseMeter"></i><span class="meter-ticks"><b>40</b><b>60</b><b>80</b></span></div>
+    <div class="noise-actions">
+      <button class="btn btn-small" id="btnNoise" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+        <span>Measure noise</span>
+      </button>
+      <form class="manual-noise" id="manualNoise" autocomplete="off">
+        <input type="number" id="manualDb" min="0" max="140" step="0.1" placeholder="dB" aria-label="Enter noise in dB manually">
+        <button class="btn btn-small btn-ghost" type="submit">Save</button>
+      </form>
+    </div>
+    <p class="advice small" id="noiseHint">Uses your microphone for ~5 s. Uncalibrated estimate; phones and laptops differ.</p>
+  </article>
+</section>
+
+<section class="grid reco" aria-label="Recommendations">
+  <article class="card verdict-card" id="verdictCard">
+    <div class="card-head">
+      <h2>Go outside?</h2>
+      <span class="muted small" id="profileNote"></span>
+    </div>
+    <div class="verdict" id="verdict" data-level="none"><span class="skeleton sk-line w40"></span></div>
+    <p class="verdict-summary" id="verdictSummary"></p>
+    <ul class="reasons" id="reasonList"></ul>
+    <ul class="actions" id="actionList"></ul>
+  </article>
+
+  <article class="card best-card">
+    <div class="card-head"><h2>Best time to go out</h2></div>
+    <div id="bestWindow"><span class="skeleton sk-line w60"></span></div>
+    <p class="muted small">Lowest combined AQI + UV + heat index across the next 24 h (06:00–22:00 only), from the hourly forecast.</p>
+    <div class="outlook" id="outlook" aria-label="Next 24 hours AQI outlook"></div>
+  </article>
+</section>
+
+{# ---------------- "How is this calculated?" modal ---------------- #}
+<dialog class="modal" id="howModal" aria-labelledby="howTitle">
+  <div class="modal-head">
+    <h2 id="howTitle">How the score is calculated</h2>
+    <button class="icon-btn" id="howClose" type="button" aria-label="Close">×</button>
+  </div>
+  <div class="modal-body">
+    <p>Each measurement is converted to a <strong>sub-score from 0 (worst) to 100 (best)</strong> using the threshold bands below. The overall score is a weighted average:</p>
+    <table class="tbl">
+      <thead><tr><th>Factor</th><th>Weight</th><th>Ideal range</th></tr></thead>
+      <tbody>
+        <tr><td>Air quality (US AQI)</td><td>{{ (method.weights.aqi * 100)|round|int }}%</td><td>0 – 50</td></tr>
+        <tr><td>Heat index</td><td>{{ (method.weights.heat_index * 100)|round|int }}%</td><td>18 – 27 °C</td></tr>
+        <tr><td>UV index</td><td>{{ (method.weights.uv * 100)|round|int }}%</td><td>0 – 2</td></tr>
+        <tr><td>Humidity</td><td>{{ (method.weights.humidity * 100)|round|int }}%</td><td>30 – 60 %</td></tr>
+        <tr><td>Noise</td><td>{{ (method.weights.noise * 100)|round|int }}%</td><td>&lt; 40 dB</td></tr>
+      </tbody>
+    </table>
+    <p class="small"><strong>Score = Σ (sub-score × weight).</strong> If noise has not been measured, it is left out and the other four weights are scaled up so they still add to 100%. <strong>Weakest-link rule:</strong> the score can be at most {{ method.weakest_link_margin }} points above the worst of the air-quality, heat and UV sub-scores, so one dangerous factor (e.g. AQI 300) cannot be hidden by good values elsewhere.</p>
+    <div id="howBreakdown"></div>
+
+    <h3>Overall label</h3>
+    <div class="chips">
+      {% for l in method.labels %}<span class="chip" data-level="{{ l.level }}">{{ l.label }} ≥ {{ l.min }}</span>{% endfor %}
+    </div>
+
+    <div class="tbl-grid">
+      {% for title, key in [("US EPA AQI", "aqi"), ("WHO UV index", "uv"), ("Temperature comfort", "temperature"), ("Humidity comfort", "humidity"), ("Noise (dB)", "noise")] %}
+      <div>
+        <h3>{{ title }}</h3>
+        <table class="tbl tbl-compact">
+          <tbody>
+          {% for r in method[key] %}
+            <tr><td>{{ r.range }}</td><td><span class="badge" data-level="{{ r.level }}">{{ r.label }}</span></td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endfor %}
+    </div>
+    <h3>Pattern rules</h3>
+    <ul class="small">
+      <li><strong>Heat stress:</strong> temperature ≥ 30 °C with humidity ≥ 60 %, or heat index ≥ 32 °C.</li>
+      <li><strong>Stagnant pollution:</strong> PM2.5 &gt; 35.4 µg/m³ with wind &lt; 10 km/h.</li>
+      <li><strong>Midday sun:</strong> UV index ≥ 6.</li>
+      <li><strong>Harmful noise:</strong> noise &gt; 80 dB.</li>
+    </ul>
+  </div>
+</dialog>
+
+<script id="bootData" type="application/json">{{ {"default": default}|tojson }}</script>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/noise.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Alerts{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <h1>Smart Alerts</h1>
+    <p class="muted">Raised automatically when a threshold is crossed. Repeats are merged: one alert per type, per location, per hour.</p>
+  </div>
+  <div class="head-actions">
+    <button class="btn" id="btnNotify" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4zM10 21h4"/></svg>
+      <span>Enable notifications</span>
+    </button>
+    <button class="btn btn-danger" id="btnClear" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
+      Clear all
+    </button>
+  </div>
+</section>
+
+<section class="card thresholds">
+  <h2>Thresholds</h2>
+  <div class="chips">
+    <span class="chip" data-level="unhealthy">AQI &gt; 150 (General, Athlete)</span>
+    <span class="chip" data-level="usg">AQI &gt; 100 (Asthma, Children, Elderly)</span>
+    <span class="chip" data-level="unhealthy">UV ≥ 8</span>
+    <span class="chip" data-level="unhealthy">Heat index &gt; 40 °C</span>
+    <span class="chip" data-level="unhealthy">Noise &gt; 80 dB</span>
+  </div>
+</section>
+
+<p class="muted small" id="notifyStatus"></p>
+<div class="error-box" id="errorBox" role="alert" hidden></div>
+
+<section id="alertList" class="alert-list" aria-live="polite"></section>
+
+<section class="empty card" id="emptyState" hidden>
+  <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M20 44V30a12 12 0 1 1 24 0v14l4 4H16zM28 54h8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <h2>No alerts</h2>
+  <p>Nothing has crossed a threshold yet. Alerts appear here when the dashboard detects unhealthy air, strong UV, dangerous heat or harmful noise.</p>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+{% endblock %}

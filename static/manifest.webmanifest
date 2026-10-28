@@ -1,0 +1,12 @@
+{
+  "name": "EcoLens Environmental Analyzer",
+  "short_name": "EcoLens",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f5f0",
+  "theme_color": "#1d7a4c",
+  "description": "Explainable environmental health insights for your next decision outdoors.",
+  "icons": [
+    {"src": "/static/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Local runtime data
+ecolens.db
+*.sqlite
+*.sqlite3
+
+# Local tooling
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
